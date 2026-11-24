@@ -1,11 +1,14 @@
-<div align="center">
+# BrixLeaf
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Daily-life botanical and food sugar calibrator for Android with a 3D multi-touch spatial interface, live Wikipedia & Open Food Facts lookup, offline-first Room storage, and exportable personal reports.
 
-  <h1>Built with AI Studio</h2>
+## Features
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+- **Exact Sugar Calibration**: Synchronously scales sugar grams, teaspoons, millimoles (`mmol`), molarity (`µmol/mL`), and refractive density (`°Bx`) with serving quantity.
+- **Interactive 3D Spatial Diagram**: Drag, pan, and pinch-to-zoom around a floating real-photo plant orb connected by animated radial lines to live metric and Wikipedia info nodes.
+- **Sugar Density State Curve**: Interactive titration diagram tracking phase transitions from *Raw & Bitter* through *Balanced Harmony* to *Syrup Saturated*.
+- **Offline-First + 1M+ Food Lookup**: Pre-seeded Room database with live Wikipedia and Open Food Facts search, plus quick offline entry and CSV/TXT personal report export.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Automated APK Builds
 
-</div>
+Pushing to this repository automatically triggers the **Build Android APK** GitHub Actions workflow and publishes `BrixLeaf-debug-apk` under the **Actions** tab.

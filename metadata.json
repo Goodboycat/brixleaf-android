@@ -1,0 +1,6 @@
+{
+  "name": "BrixLeaf",
+  "description": "Precision daily-life botanical and food sugar calibrator with interactive 3D spatial diagram, real plant photography, Wikipedia & Open Food Facts lookup, and personal exportable reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

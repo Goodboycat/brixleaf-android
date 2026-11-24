@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">BrixLeaf</string>
+    <string name="search_hint">Search 1M+ foods or plants (e.g. Aloe Vera)</string>
+    <string name="info_container_title">Botanical Info</string>
+    <string name="close_info_desc">Close plant information</string>
+    <string name="export_report_title">Personal Sugar Report</string>
+</resources>
