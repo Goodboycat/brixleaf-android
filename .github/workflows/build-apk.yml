@@ -10,6 +10,8 @@ jobs:
 
     env:
       JAVA_TOOL_OPTIONS: "-Djava.awt.headless=true"
+      STORE_PASSWORD: "brixleaf_ci_store_pass"
+      KEY_PASSWORD: "brixleaf_ci_store_pass"
 
     steps:
       - name: Checkout repository
@@ -27,9 +29,9 @@ jobs:
             yes | "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager --licenses >/dev/null 2>&1 || true
           fi
 
-      - name: Generate universally valid debug keystore (2020-2050)
+      - name: Generate universally valid release & debug keystores (2020-2050)
         run: |
-          rm -f debug.keystore
+          rm -f debug.keystore my-upload-key.jks
           keytool -genkeypair -v \
             -keystore debug.keystore \
             -storepass android \
@@ -40,42 +42,52 @@ jobs:
             -startdate "2020/01/01 00:00:00" \
             -validity 10950 \
             -dname "CN=Android Debug,O=Android,C=US"
+          keytool -genkeypair -v \
+            -keystore my-upload-key.jks \
+            -storepass "$STORE_PASSWORD" \
+            -alias upload \
+            -keypass "$KEY_PASSWORD" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -startdate "2020/01/01 00:00:00" \
+            -validity 10950 \
+            -dname "CN=BrixLeaf,O=BrixLeaf,C=US"
 
       - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.3.1'
 
-      - name: Build Debug APK
+      - name: Build Release APK
+        env:
+          KEYSTORE_PATH: "${{ github.workspace }}/my-upload-key.jks"
         run: >
-          gradle assembleDebug
+          gradle assembleRelease
           -Pkotlin.compiler.execution.strategy=daemon
           -Dorg.gradle.jvmargs="-Xmx3g -Dfile.encoding=UTF-8 -Djava.awt.headless=true"
           -Dorg.gradle.parallel=false
           --max-workers=2
 
-      - name: Sign APK with v1, v2, and v3 schemes & verify
+      - name: Sign Release APK with v1, v2, and v3 schemes & verify alignment
         run: |
           BUILD_TOOLS_DIR=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)
-          APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
-          ALIGNED_APK="app/build/outputs/apk/debug/app-debug-aligned.apk"
-          "$BUILD_TOOLS_DIR/zipalign" -f -p 4 "$APK_PATH" "$ALIGNED_APK"
-          mv "$ALIGNED_APK" "$APK_PATH"
+          APK_PATH="app/build/outputs/apk/release/app-release.apk"
           "$BUILD_TOOLS_DIR/apksigner" sign \
-            --ks debug.keystore \
-            --ks-pass pass:android \
-            --ks-key-alias androiddebugkey \
-            --key-pass pass:android \
+            --ks my-upload-key.jks \
+            --ks-pass "pass:$STORE_PASSWORD" \
+            --ks-key-alias upload \
+            --key-pass "pass:$KEY_PASSWORD" \
             --min-sdk-version 21 \
             --v1-signing-enabled true \
             --v2-signing-enabled true \
             --v3-signing-enabled true \
             "$APK_PATH"
           "$BUILD_TOOLS_DIR/apksigner" verify --verbose "$APK_PATH"
+          "$BUILD_TOOLS_DIR/zipalign" -c -P 16 -v 4 "$APK_PATH" >/dev/null
 
-      - name: Upload BrixLeaf APK Artifact
+      - name: Upload BrixLeaf Release APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BrixLeaf-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: BrixLeaf-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
           retention-days: 30
